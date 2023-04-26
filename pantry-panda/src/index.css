@@ -46,7 +46,7 @@ input {
   gap: 10px;
 }
 
-button {
+.button-container button {
   color: #FDFDFD;
   background-color: #AC485A;
   font-family: 'Rubik', sans-serif;
@@ -58,10 +58,19 @@ button {
   width: 0;
 }
 
-button:hover {
+.button-container button:hover {
   background-color: #432000;
   cursor: pointer;
 }
+
+#sign-in-button {
+  font-family: 'Rubik', sans-serif;
+  border: 0;
+  border-radius: 8px;
+  padding: 8px;
+}
+
+
 
 ul {
   display: flex;
