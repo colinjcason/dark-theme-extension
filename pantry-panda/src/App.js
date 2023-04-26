@@ -1,24 +1,44 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { ListItem } from "./components/ListItem"
 import logo from './assets/panda (1).png'
-import { auth, googleProvider } from './firebase'
+import { auth, googleProvider, db } from './firebase'
 import { signInWithPopup } from 'firebase/auth'
+import { getDocs, collection } from 'firebase/firestore'
 
 function App() {
   // const ref = firebase.firestore().collection('shopping-list')
 
   const [lineThrough, setLineThrough] = useState(false)
+  const [listItems, setListItems] = useState([])
 
-  const toggle = () => {
-    setLineThrough(prevState => !prevState)
-  }
+  const listItemsRef = collection(db, 'shopping-list')
 
+  useEffect(() => {
+    const getItemsList = async () => {
+     try {
+      const data = await getDocs(listItemsRef)
+      const filteredData = data.docs.map(doc => ({...doc.data(), id: doc.id}))
+      setListItems(filteredData)
+      console.log(filteredData)
+     } catch (error) {
+      console.log(error)
+     } 
+    }
+
+    getItemsList()
+  }, [])
+
+  
   const signInWithGoogle = async () => {
     try {
       await signInWithPopup(auth, googleProvider)
     } catch (error) {
       console.log(error)
     }
+  }
+  
+  const toggle = () => {
+    setLineThrough(prevState => !prevState)
   }
 
   return (
@@ -36,9 +56,14 @@ function App() {
       </div>
 
       <ul className="shopping-list">
-        <ListItem toggle={toggle} lineThrough={lineThrough} />
-        <ListItem />
-        <ListItem />
+        {listItems.map(item => (
+          <ListItem 
+            toggle={toggle} 
+            lineThrough={lineThrough} 
+            name={item.name} 
+            key={item.id}
+          />
+        ))}
       </ul>
     </div>
   );

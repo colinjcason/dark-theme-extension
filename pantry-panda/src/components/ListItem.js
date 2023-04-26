@@ -1,6 +1,6 @@
 import React from 'react'
 
-export const ListItem = ({ lineThrough, toggle }) => {
+export const ListItem = ({ lineThrough, toggle, name }) => {
   const styles = {
     textDecoration: lineThrough ? 'line-through' : 'none'
   }
@@ -11,7 +11,7 @@ export const ListItem = ({ lineThrough, toggle }) => {
       style={styles}
       onClick={() => toggle()}
     >
-      Item
+      {name}
     </div>
   )
 }
