@@ -1,7 +1,17 @@
-import { ListItem } from "./components/ListItem";
+import { useState } from 'react'
+import { ListItem } from "./components/ListItem"
 import logo from './assets/panda (1).png'
+// import firebase from './firebase'
 
 function App() {
+  // const ref = firebase.firestore().collection('shopping-list')
+
+  const [lineThrough, setLineThrough] = useState(false)
+
+  const toggle = () => {
+    setLineThrough(prevState => !prevState)
+  }
+
   return (
     <div className="app">
       <img src={logo} alt='panda eating noodles'/>
@@ -16,7 +26,7 @@ function App() {
       </div>
 
       <ul className="shopping-list">
-        <ListItem />
+        <ListItem toggle={toggle} lineThrough={lineThrough} />
         <ListItem />
         <ListItem />
       </ul>
