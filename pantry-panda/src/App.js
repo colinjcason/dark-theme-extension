@@ -3,29 +3,30 @@ import { ListItem } from "./components/ListItem"
 import logo from './assets/panda (1).png'
 import { auth, googleProvider, db } from './firebase'
 import { signInWithPopup } from 'firebase/auth'
-import { getDocs, collection } from 'firebase/firestore'
+import { getDocs, collection, addDoc } from 'firebase/firestore'
 
 function App() {
   // const ref = firebase.firestore().collection('shopping-list')
 
   const [lineThrough, setLineThrough] = useState(false)
   const [listItems, setListItems] = useState([])
+  const [newItem, setNewItem] = useState('')
 
   const listItemsRef = collection(db, 'shopping-list')
 
-  useEffect(() => {
-    const getItemsList = async () => {
-     try {
-      const data = await getDocs(listItemsRef)
-      const filteredData = data.docs.map(doc => ({...doc.data(), id: doc.id}))
-      setListItems(filteredData)
-      console.log(filteredData)
-     } catch (error) {
-      console.log(error)
-     } 
-    }
+  const getItemsList = async () => {
+    try {
+     const data = await getDocs(listItemsRef)
+     const filteredData = data.docs.map(doc => ({...doc.data(), id: doc.id}))
+     setListItems(filteredData)
+     console.log(filteredData)
+    } catch (error) {
+     console.log(error)
+    } 
+   }
 
-    getItemsList()
+  useEffect(() => {
+   getItemsList()    
   }, [])
 
   
@@ -41,6 +42,22 @@ function App() {
     setLineThrough(prevState => !prevState)
   }
 
+  const handleChange = (e) => {
+    const str = e.target.value
+    setNewItem(str.charAt(0).toUpperCase() + str.slice(1))
+    console.log(newItem)
+  }
+
+  const submitItem = async () => {
+    try {
+      await addDoc(listItemsRef, {name: newItem})
+      
+      getItemsList()
+    } catch (error) {
+      console.log(error)
+    }
+  }
+
   return (
     <div className="app">
       <img src={logo} alt='panda eating noodles'/>
@@ -49,9 +66,16 @@ function App() {
         <br/>
         Click your items to mark them off your list!
       </h5>
-      <input type='text' id='input-field' placeholder="Bread" />
+
+      <input 
+        type='text' 
+        id='input-field' 
+        placeholder="Bread"
+        onChange={handleChange}
+       />
+
       <div className="button-container">
-        <button>Add to List</button>
+        <button onClick={submitItem}>Add to List</button>
         <button>Clear List</button>
       </div>
 
