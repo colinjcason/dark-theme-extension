@@ -1,33 +1,31 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useReducer, useCallback } from 'react'
 import { ListItem } from "./components/ListItem"
 import logo from './assets/panda (1).png'
 import { auth, googleProvider, db } from './firebase'
 import { signInWithPopup } from 'firebase/auth'
-import { getDocs, collection, addDoc } from 'firebase/firestore'
+import { getDocs, collection, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore'
 
 function App() {
-  // const ref = firebase.firestore().collection('shopping-list')
-
-  const [lineThrough, setLineThrough] = useState(false)
+  // const [lineThrough, setLineThrough] = useReducer(prevState => !prevState, false)
   const [listItems, setListItems] = useState([])
   const [newItem, setNewItem] = useState('')
+  const [inputField, setInputField] = useState('')
 
   const listItemsRef = collection(db, 'shopping-list')
 
-  const getItemsList = async () => {
+  const getItemsList = useCallback(async () => {
     try {
      const data = await getDocs(listItemsRef)
      const filteredData = data.docs.map(doc => ({...doc.data(), id: doc.id}))
      setListItems(filteredData)
-     console.log(filteredData)
     } catch (error) {
      console.log(error)
     } 
-   }
+   }, [listItemsRef])
 
   useEffect(() => {
    getItemsList()    
-  }, [])
+  }, [getItemsList])
 
   
   const signInWithGoogle = async () => {
@@ -38,24 +36,33 @@ function App() {
     }
   }
   
-  const toggle = () => {
-    setLineThrough(prevState => !prevState)
+  const toggle = async (id) => {
+    const item = doc(db, 'shopping-list', id)
+    // await updateDoc(item, {strikethrough: true})
   }
 
   const handleChange = (e) => {
     const str = e.target.value
     setNewItem(str.charAt(0).toUpperCase() + str.slice(1))
-    console.log(newItem)
   }
 
-  const submitItem = async () => {
+  const addItem = async () => {
     try {
-      await addDoc(listItemsRef, {name: newItem})
-      
+      await addDoc(listItemsRef, {name: newItem, strikethrough: false})      
       getItemsList()
+      setInputField('')
     } catch (error) {
       console.log(error)
     }
+  }
+
+  const deleteItem = async (id) => {
+    const item = doc(db, 'shopping-list', id)
+    await deleteDoc(item)
+  }
+
+  const clearList = () => {
+    setListItems([])
   }
 
   return (
@@ -71,21 +78,25 @@ function App() {
         type='text' 
         id='input-field' 
         placeholder="Bread"
+        name='inputField'
+        value={inputField}
         onChange={handleChange}
        />
 
       <div className="button-container">
-        <button onClick={submitItem}>Add to List</button>
-        <button>Clear List</button>
+        <button onClick={addItem}>Add to List</button>
+        <button onClick={clearList}>Clear List</button>
       </div>
 
       <ul className="shopping-list">
         {listItems.map(item => (
           <ListItem 
             toggle={toggle} 
-            lineThrough={lineThrough} 
+            strikethrough={item.strikethrough} 
             name={item.name} 
             key={item.id}
+            id={item.id}
+            deleteItem={deleteItem}
           />
         ))}
       </ul>

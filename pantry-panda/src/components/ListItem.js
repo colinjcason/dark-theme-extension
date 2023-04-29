@@ -1,17 +1,18 @@
 import React from 'react'
 
-export const ListItem = ({ lineThrough, toggle, name }) => {
+export const ListItem = ({ strikethrough, toggle, name, deleteItem, id }) => {
   const styles = {
-    textDecoration: lineThrough ? 'line-through' : 'none'
+    textDecoration: strikethrough ? 'line-through' : 'none'
   }
 
   return (
     <div 
       className='list-item' 
       style={styles}
-      onClick={() => toggle()}
+      onClick={() => toggle(id)}
     >
       {name}
+      <button onClick={() => deleteItem(id)}>Delete</button>
     </div>
   )
 }
