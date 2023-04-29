@@ -2,7 +2,7 @@ import { useState, useEffect, useReducer, useCallback } from 'react'
 import { ListItem } from "./components/ListItem"
 import logo from './assets/panda (1).png'
 import { auth, googleProvider, db } from './firebase'
-import { signInWithPopup } from 'firebase/auth'
+import { signInWithPopup, signOut } from 'firebase/auth'
 import { getDocs, collection, addDoc, deleteDoc, doc, updateDoc } from 'firebase/firestore'
 
 function App() {
@@ -35,6 +35,14 @@ function App() {
       console.log(error)
     }
   }
+
+  const logout = async () => {
+    try {
+      await signOut(auth);
+    } catch (err) {
+      console.error(err);
+    }
+  };
   
   const toggle = async (id) => {
     const item = doc(db, 'shopping-list', id)
@@ -44,6 +52,7 @@ function App() {
   const handleChange = (e) => {
     const str = e.target.value
     setNewItem(str.charAt(0).toUpperCase() + str.slice(1))
+    setInputField(e.target.value)
   }
 
   const addItem = async () => {
@@ -69,6 +78,7 @@ function App() {
     <div className="app">
       <img src={logo} alt='panda eating noodles'/>
       <button onClick={signInWithGoogle} id='sign-in-button'>Sign In</button>
+      <button onClick={logout} id='sign-in-button'>Sign Out</button>
       <h5>A friend to help with your shopping checklist!
         <br/>
         Click your items to mark them off your list!
