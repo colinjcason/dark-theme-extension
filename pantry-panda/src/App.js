@@ -55,9 +55,14 @@ function App() {
     setInputField(e.target.value)
   }
 
+  // Adding item to shopping list
   const addItem = async () => {
     try {
-      await addDoc(listItemsRef, {name: newItem, strikethrough: false})      
+      await addDoc(listItemsRef, {
+        name: newItem, 
+        strikethrough: false,
+        userId: auth?.currentUser?.uid
+      })      
       getItemsList()
       setInputField('')
     } catch (error) {
